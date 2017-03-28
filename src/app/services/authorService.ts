@@ -1,22 +1,38 @@
-import { Injectable } from '@angular/core';
-import {Http} from '@angular/http';
+import { Injectable, Inject } from '@angular/core';
+import { Http, Response } from '@angular/http';
 
 import { Author } from '../models/author';
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/Operator/add/do';
+import 'rxjs/add/operator/do';
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/operator/filter';
+import 'rxjs/add/observable/throw';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/observable/of';
+import { BaseService } from 'app/services/baseService';
+
 @Injectable()
-export class AuthorService {
-    private apiUrl = 'http://localhost:port/api/';
-    constructor(private http: Http) {}
+export class AuthorService extends BaseService {
+    constructor( @Inject('API_URL') private apiUrl: string, private http: Http) {super(); }
     getAuthors(): Observable<Author[]> {
-        return this.http.get(this.apiUrl + 'authors')
-            .map(res => res.json().data || {})
-            .do(data => console.log('products', data))
+        return this.http.get(this.apiUrl)
+            .map(super.extractData)
+            .do(data => console.log('authors', data))
             .catch(this.handleError);
     }
-    handleError(error){
-        // send error to server for logging
-        console.log(error);
-        return Observable.throw(error.json().error || 'Server error');
+    getAuthor(id: number): Observable<Author> {
+        // return this.http.get(this.apiUrl)
+        //     .map(this.extractData)
+        // when using api, wont have to filter list
+        return this.getAuthors()
+            .map(authors => authors.filter(author => author.id === id))
+            .do(data => console.log(data))
+            .catch(this.handleError);
+    }
+    saveAuthor(author: Author): Observable<Author> {
+        return this.getAuthors()
+            .map(authors => authors.filter(author => author.id === author.id))
+            .do(data => console.log(data))
+            .catch(this.handleError);
     }
 }

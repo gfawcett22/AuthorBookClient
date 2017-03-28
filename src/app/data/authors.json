@@ -1,0 +1,22 @@
+{
+    "data": [
+        {
+            "id": 1,
+            "name": "Test author",
+            "genre": "Nonfiction",
+            "age": 45
+        },
+        {
+            "id": 2,
+            "name": "Test author2",
+            "genre": "Fiction",
+            "age": 64
+        },
+        {
+            "id": 3,
+            "name": "Test author3",
+            "genre": "Mystery",
+            "age": 26
+        }
+    ]
+}

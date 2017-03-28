@@ -1,6 +1,6 @@
-export enum Genre {Fiction, NonFiction, Romance, Thriller, Mystery};
 export interface Author{
+    id: number;
     name: string;
-    genre: Genre;
+    genre: string;
     age: number;
 }
