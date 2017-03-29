@@ -9,7 +9,7 @@ import { RouterModule } from '@angular/router';
     imports: [
         SharedModule,
         RouterModule.forChild([
-            {path: 'authors/:authorId/books', component: BookListComponent}
+            {path: 'authors/:id/books', component: BookListComponent}
         ])
         ],
     exports: [BookListComponent],

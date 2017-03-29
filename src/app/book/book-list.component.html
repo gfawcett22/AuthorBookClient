@@ -1,1 +1,32 @@
-<h3>book list</h3>
+<div class="panel panel-primary">
+    <div class="panel-heading">Books</div>
+    <div class="panel-body">
+
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Title</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor='let author of authors'>
+                        <td>
+                            <a class="btn btn-sm btn-primary"
+                            [routerLink]="['/authors', author.id, 'books']">
+                                Edit Book
+                            </a>
+                        </td>
+                        <td>{{author.name}}</td>
+                        <td>{{author.genre}}</td>
+                        <td>{{author.age}}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+        <button (click)="this.getAuthor(1)">Refresh</button>
+    </div>
+</div>

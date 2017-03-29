@@ -17,22 +17,25 @@ export class AuthorService extends BaseService {
     getAuthors(): Observable<Author[]> {
         return this.http.get(this.apiUrl)
             .map(super.extractData)
-            .do(data => console.log('authors', data))
+            // .do(data => console.log(data))
             .catch(this.handleError);
     }
     getAuthor(id: number): Observable<Author> {
-        // return this.http.get(this.apiUrl)
-        //     .map(this.extractData)
-        // when using api, wont have to filter list
-        return this.getAuthors()
-            .map(authors => authors.filter(author => author.id === id))
-            .do(data => console.log(data))
+        let url = this.apiUrl + '/' + id;
+        console.log(url);
+        return this.http.get(url)
+            .map(this.extractData)
+            // .do(data => console.log(data))
             .catch(this.handleError);
     }
     saveAuthor(author: Author): Observable<Author> {
-        return this.getAuthors()
-            .map(authors => authors.filter(author => author.id === author.id))
+        let url = this.apiUrl + '/' + author.id;
+        return this.http.put(url, author, null)
+            // .map(authors => authors.filter(author => author.id === author.id))
             .do(data => console.log(data))
             .catch(this.handleError);
+    }
+    deleteAuthor(id: number): Observable<Response> {
+        return this.http.delete(this.apiUrl + '/' + id);
     }
 }

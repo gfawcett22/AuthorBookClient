@@ -6,18 +6,21 @@ import { SharedModule } from 'app/shared/shared.module';
 import { AuthorService } from 'app/services/authorService';
 import { RouterModule } from '@angular/router';
 import { BookListComponent } from 'app/book/book-list.component';
+import { AuthorEditComponent } from 'app/author/author-edit.component';
 
 @NgModule({
     imports: [
         SharedModule,
         RouterModule.forChild([
-            {path: 'authors/:authorId/books', component: BookListComponent}
+            {path: 'authors/:id/books', component: BookListComponent},
+            {path: 'authors/:id/edit', component: AuthorEditComponent}
         ])
-        ],
+    ],
     exports: [AuthorListComponent],
     declarations: [
         AuthorListComponent,
-        AuthorComponent
+        AuthorComponent,
+        AuthorEditComponent
     ],
     providers: [AuthorService],
 })

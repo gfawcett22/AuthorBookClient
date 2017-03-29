@@ -23,7 +23,7 @@ export class BookListComponent implements OnInit {
         // subscribe to route id changes
         this.sub = this.route.params.subscribe(
             params => {
-                let id = +params['authorId'];
+                let id = +params['id'];
                 this.getBooksForAuthor(id);
             }
         );

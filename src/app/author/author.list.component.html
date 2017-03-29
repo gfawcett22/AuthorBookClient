@@ -19,6 +19,10 @@
                             [routerLink]="['/authors', author.id, 'books']">
                                 View Books
                             </a>
+                            <a class="btn btn-sm btn-primary"
+                            [routerLink]="['/authors', author.id, 'edit']">
+                                Edit
+                            </a>
                         </td>
                         <td>{{author.name}}</td>
                         <td>{{author.genre}}</td>

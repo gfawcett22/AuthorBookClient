@@ -1,6 +1,6 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, ViewChildren, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, FormArray, Validators, FormControlName } from '@angular/forms';
-import { ActivatedRoute, Router  } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/observable/fromEvent';
@@ -8,7 +8,7 @@ import 'rxjs/add/observable/merge';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 
-import { Author } from '../models/author';
+import { AuthorToCreateDto } from '../models/authorToCreateDto';
 import { AuthorService } from '../services/authorService';
 
 // import { NumberValidators } from '../shared/number.validator';
@@ -18,14 +18,14 @@ import { AuthorService } from '../services/authorService';
     templateUrl: './author-edit.component.html'
 })
 export class AuthorEditComponent implements OnInit, AfterViewInit, OnDestroy {
-        AuthorService: any;
+    AuthorService: any;
     @ViewChildren(FormControlName, { read: ElementRef }) formInputElements: ElementRef[];
-
+    authorId: number;
     pageTitle: string = 'Author Edit';
     errorMessage: string;
     authorForm: FormGroup;
 
-    author: Author;
+    author: AuthorToCreateDto;
     private sub: Subscription;
 
     // Use with the generic validation message class
@@ -38,9 +38,9 @@ export class AuthorEditComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     constructor(private fb: FormBuilder,
-                private route: ActivatedRoute,
-                private router: Router,
-                private authorService: AuthorService) {
+        private route: ActivatedRoute,
+        private router: Router,
+        private authorService: AuthorService) {
 
         // Defines all of the validation messages for the form.
         // These could instead be retrieved from a file or database.
@@ -50,7 +50,7 @@ export class AuthorEditComponent implements OnInit, AfterViewInit, OnDestroy {
                 minlength: 'Author name must be at least three characters.',
                 maxlength: 'Author name cannot exceed 50 characters.'
             },
-            gemre: {
+            genre: {
                 required: 'Genre is required.'
             },
             dateOfBirth: {
@@ -67,18 +67,20 @@ export class AuthorEditComponent implements OnInit, AfterViewInit, OnDestroy {
     ngOnInit(): void {
         this.authorForm = this.fb.group({
             authorName: ['', [Validators.required,
-                               Validators.minLength(3),
-                               Validators.maxLength(50)]],
+            Validators.minLength(3),
+            Validators.maxLength(50)]],
             genre: ['', Validators.required],
             dateOfBirth: '',
             books: this.fb.array([])
         });
 
-        // Read the product Id from the route parameter
+        // Read the author Id from the route parameter
         this.sub = this.route.params.subscribe(
             params => {
                 let id = +params['id'];
+                console.log(id);
                 this.getAuthor(id);
+                this.authorId = id;
             }
         );
     }
@@ -89,8 +91,8 @@ export class AuthorEditComponent implements OnInit, AfterViewInit, OnDestroy {
 
     ngAfterViewInit(): void {
         // Watch for the blur event from any input element on the form.
-        let controlBlurs: Observable<any>[] = this.formInputElements
-            .map((formControl: ElementRef) => Observable.fromEvent(formControl.nativeElement, 'blur'));
+        // let controlBlurs: Observable<any>[] = this.formInputElements
+        //     .map((formControl: ElementRef) => Observable.fromEvent(formControl.nativeElement, 'blur'));
 
         // Merge the blur event observable with the valueChanges observable
         // Observable.merge(this.authorForm.valueChanges, ...controlBlurs).debounceTime(800).subscribe(value => {
@@ -99,18 +101,23 @@ export class AuthorEditComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     addBook(): void {
-        this.books.push(new FormControl());
+        this.books.push(this.createBook());
     }
-
+    createBook(title = '', desc = '') {
+        return this.fb.group({
+            title: [title, Validators.required],
+            description: [desc, [Validators.required, Validators.maxLength(50)]]
+        });
+    }
     getAuthor(id: number): void {
         this.authorService.getAuthor(id)
             .subscribe(
-                (author: Author) => this.onAuthorRetrieved(author),
-                (error: any) => this.errorMessage = <any>error
+            (author: AuthorToCreateDto) => this.onAuthorRetrieved(author),
+            (error: any) => this.errorMessage = <any>error
             );
     }
 
-    onAuthorRetrieved(author: Author): void {
+    onAuthorRetrieved(author: AuthorToCreateDto): void {
         if (this.authorForm) {
             this.authorForm.reset();
         }
@@ -128,33 +135,41 @@ export class AuthorEditComponent implements OnInit, AfterViewInit, OnDestroy {
             genre: this.author.genre,
             dateOfBirth: this.author.dateOfBirth
         });
-        // this.authorForm.setControl('books', this.fb.array(this.author.books || []));
+
+        if (this.author.books && this.author.books.length > 0) {
+            //let bookFormGroupArray: FormArray;
+            this.author.books.forEach(element => {
+                (<FormArray>this.authorForm.get('books')).push(this.createBook(element.title, element.description));
+            });
+            //this.authorForm.setControl('books', bookFormGroupArray);
+        }
     }
 
     deleteAuthor(): void {
         if (this.author.id === 0) {
             // Don't delete, it was never saved.
             this.onSaveComplete();
-       } else {
-            if (confirm(`Really delete the product: ${this.author.name}?`)) {
-                this.AuthorService.deleteProduct(this.author.id)
+        } else {
+            if (confirm(`Really delete the author: ${this.author.name}?`)) {
+                this.authorService.deleteAuthor(this.author.id)
                     .subscribe(
-                        () => this.onSaveComplete(),
-                        (error: any) => this.errorMessage = <any>error
+                    () => this.onSaveComplete(),
+                    (error: any) => this.errorMessage = <any>error
                     );
             }
         }
     }
 
-    saveProduct(): void {
+    saveAuthor(): void {
         if (this.authorForm.dirty && this.authorForm.valid) {
-            // Copy the form values over the product object values
-            let p = Object.assign({}, this.author, this.authorForm.value);
-
-            this.AuthorService.saveAuthor(p)
+            // Copy the form values over the author object values
+            // essentially allowing all updates to be put instead of patch
+            const a = Object.assign({}, this.author, this.authorForm.value);
+            console.log(a);
+            this.authorService.saveAuthor(a)
                 .subscribe(
-                    () => this.onSaveComplete(),
-                    (error: any) => this.errorMessage = <any>error
+                () => this.onSaveComplete(),
+                (error: any) => this.errorMessage = <any>error
                 );
         } else if (!this.authorForm.dirty) {
             this.onSaveComplete();
@@ -164,6 +179,6 @@ export class AuthorEditComponent implements OnInit, AfterViewInit, OnDestroy {
     onSaveComplete(): void {
         // Reset the form to clear the flags
         this.authorForm.reset();
-        this.router.navigate(['/products']);
+        this.router.navigate(['/authors']);
     }
 }
