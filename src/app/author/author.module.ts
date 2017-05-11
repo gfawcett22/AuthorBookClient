@@ -13,7 +13,7 @@ import { AuthorEditComponent } from 'app/author/author-edit.component';
         SharedModule,
         RouterModule.forChild([
             {path: 'authors/:id/books', component: BookListComponent},
-            {path: 'authors/:id/edit', component: AuthorEditComponent}
+            {path: 'authorEdit/:id', component: AuthorEditComponent}
         ])
     ],
     exports: [AuthorListComponent],

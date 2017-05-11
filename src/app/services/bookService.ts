@@ -1,6 +1,7 @@
 import { Injectable, Inject } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import { BaseService } from 'app/services/baseService';
+//import { API_URL } from 'app/app.module';
 
 @Injectable()
 export class BookService extends BaseService {
@@ -10,13 +11,8 @@ export class BookService extends BaseService {
     getBooksForAuthor(authorId: number) {
         const url = this.apiUrl + '/' + authorId + '/books';
         return this.http.get(url)
-            .map(this.extractData)
-            .do(data => console.log(data))
-            .catch(this.handleError);
-    }
-    // OVERRIDE BASE SERVICE TO GET BOOKS ATTRIBUTE FROM RESPONSE. NOT NEEDED WHEN RUNNING SERVER
-    extractData(response: Response) {
-        const body = response.json();
-        return body.data.books || {};
+            .map(super.extractData)
+            // .do(data => console.log(data))
+            .catch(super.handleError);
     }
 }

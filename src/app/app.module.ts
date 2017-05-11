@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { NgModule, InjectionToken, OpaqueToken } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import {RouterModule} from '@angular/router';
@@ -26,7 +26,7 @@ import { BookListComponent } from 'app/book/book-list.component';
     BrowserModule,
     FormsModule,
     HttpModule,
-    InMemoryWebApiModule.forRoot(InMemAuthorService, {delay: 500}),
+    // InMemoryWebApiModule.forRoot(InMemAuthorService, {delay: 500}),
     RouterModule.forRoot([
       { path: 'authors', component: AuthorListComponent },
       { path: '', redirectTo: 'authors', pathMatch: 'full' },
@@ -35,7 +35,7 @@ import { BookListComponent } from 'app/book/book-list.component';
     BookModule
   ],
   providers: [
-    {provide: 'API_URL', useValue: 'api/authors'}
+    {provide: 'API_URL', useValue: 'http://localhost:59267/api/authors'}
   ],
   bootstrap: [AppComponent]
 })

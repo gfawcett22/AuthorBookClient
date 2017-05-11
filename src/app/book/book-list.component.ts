@@ -12,6 +12,7 @@ import { Book } from 'app/models/book';
 })
 
 export class BookListComponent implements OnInit {
+    authorName: string;
     books: Book[];
     private sub: Subscription;
 

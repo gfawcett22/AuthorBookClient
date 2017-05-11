@@ -6,16 +6,17 @@
     <div class="panel-body">
         <form class="form-horizontal" novalidate (ngSubmit)="saveAuthor()" [formGroup]="authorForm">
             <fieldset>
-                <div class="form-group" [ngClass]="{'has-error': displayMessage.authorName }">
-                    <label class="col-md-2 control-label" for="authorNameId">Author Name</label>
+                <div class="form-group" [ngClass]="{'has-error': displayMessage.name }">
+                    <label class="col-md-2 control-label" for="nameId">First Name</label>
 
                     <div class="col-md-8">
-                        <input class="form-control" id="authorNameId" type="text" placeholder="Name (required)" formControlName="authorName" />
-                        <span class="help-block" *ngIf="displayMessage.authorName">
-                                {{displayMessage.authorName}}
+                        <input class="form-control" id="nameId" type="text" placeholder="Name (required)" formControlName="name" />
+                        <span class="help-block" *ngIf="displayMessage.name">
+                                {{displayMessage.name}}
                         </span>
                     </div>
-                </div>
+                    
+                </div>            
 
                 <div class="form-group" [ngClass]="{'has-error': displayMessage.genre}">
                     <label class="col-md-2 control-label" for="genreId">Author Genre</label>
@@ -28,7 +29,7 @@
                     </div>
                 </div>
 
-                <div *ngIf="this.authorId === null || this.authorId === 0" class="form-group" [ngClass]="{'has-error': displayMessage.dateOfBirth}">
+                <div class="form-group" [ngClass]="{'has-error': displayMessage.dateOfBirth}">
                     <label class="col-md-2 control-label" for="dateOfBirthId">Date of Birth</label>
 
                     <div class="col-md-8">

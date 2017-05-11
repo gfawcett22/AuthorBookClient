@@ -20,7 +20,7 @@
                                 View Books
                             </a>
                             <a class="btn btn-sm btn-primary"
-                            [routerLink]="['/authors', author.id, 'edit']">
+                            [routerLink]="['/authorEdit', author.id]">
                                 Edit
                             </a>
                         </td>
@@ -32,6 +32,6 @@
             </table>
 
         </div>
-        <button (click)="this.getAuthor(1)">Refresh</button>
+        <button class="btn btn-primary" (click)="refreshAuthors()">Refresh</button>
     </div>
 </div>

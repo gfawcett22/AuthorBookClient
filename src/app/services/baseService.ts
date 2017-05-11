@@ -5,7 +5,7 @@ import 'rxjs/add/observable/throw';
 export class BaseService {
     protected extractData(response: Response) {
         const body = response.json();
-        return body.data || {};
+        return body || {};
     }
     protected handleError(error) {
         // send error to server for logging

@@ -18,9 +18,12 @@ export class AuthorListComponent implements OnInit {
             .subscribe(authors => this.authors = authors,
                 err => console.log(err));
      }
-     getAuthor(id: number){
+     getAuthor(id: number) {
          this.authorService.getAuthor(id)
             .subscribe(author => console.log(author),
                 err => console.log(err));
+     }
+     refreshAuthors(){
+         this.getAuthors();
      }
 }

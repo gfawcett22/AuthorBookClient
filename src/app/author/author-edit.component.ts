@@ -8,8 +8,9 @@ import 'rxjs/add/observable/merge';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
 
-import { AuthorToCreateDto } from '../models/authorToCreateDto';
 import { AuthorService } from '../services/authorService';
+import { Author } from 'app/models/author';
+import { GenericValidator } from "app/shared/generic-validator";
 
 // import { NumberValidators } from '../shared/number.validator';
 // import { GenericValidator } from '../shared/generic-validator';
@@ -21,12 +22,13 @@ export class AuthorEditComponent implements OnInit, AfterViewInit, OnDestroy {
     AuthorService: any;
     @ViewChildren(FormControlName, { read: ElementRef }) formInputElements: ElementRef[];
     authorId: number;
-    pageTitle: string = 'Author Edit';
+    pageTitle = 'Author Edit';
     errorMessage: string;
     authorForm: FormGroup;
 
-    author: AuthorToCreateDto;
+    author: Author;
     private sub: Subscription;
+    private genericValidator: GenericValidator;
 
     // Use with the generic validation message class
     displayMessage: { [key: string]: string } = {};
@@ -41,14 +43,13 @@ export class AuthorEditComponent implements OnInit, AfterViewInit, OnDestroy {
         private route: ActivatedRoute,
         private router: Router,
         private authorService: AuthorService) {
-
         // Defines all of the validation messages for the form.
         // These could instead be retrieved from a file or database.
         this.validationMessages = {
-            authorName: {
-                required: 'Author name is required.',
-                minlength: 'Author name must be at least three characters.',
-                maxlength: 'Author name cannot exceed 50 characters.'
+            name: {
+                required: 'Name is required.',
+                minlength: 'Name must be at least three characters.',
+                maxlength: 'Name cannot exceed 50 characters.'
             },
             genre: {
                 required: 'Genre is required.'
@@ -61,14 +62,14 @@ export class AuthorEditComponent implements OnInit, AfterViewInit, OnDestroy {
 
         // Define an instance of the validator for use with this form, 
         // passing in this form's set of validation messages.
-        // this.genericValidator = new GenericValidator(this.validationMessages);
+         this.genericValidator = new GenericValidator(this.validationMessages);
     }
 
     ngOnInit(): void {
         this.authorForm = this.fb.group({
-            authorName: ['', [Validators.required,
-            Validators.minLength(3),
-            Validators.maxLength(50)]],
+            name: ['', [Validators.required,
+                Validators.minLength(3),
+                Validators.maxLength(50)]],
             genre: ['', Validators.required],
             dateOfBirth: '',
             books: this.fb.array([])
@@ -78,7 +79,6 @@ export class AuthorEditComponent implements OnInit, AfterViewInit, OnDestroy {
         this.sub = this.route.params.subscribe(
             params => {
                 let id = +params['id'];
-                console.log(id);
                 this.getAuthor(id);
                 this.authorId = id;
             }
@@ -86,18 +86,17 @@ export class AuthorEditComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        this.sub.unsubscribe();
     }
 
     ngAfterViewInit(): void {
         // Watch for the blur event from any input element on the form.
-        // let controlBlurs: Observable<any>[] = this.formInputElements
-        //     .map((formControl: ElementRef) => Observable.fromEvent(formControl.nativeElement, 'blur'));
+         let controlBlurs: Observable<any>[] = this.formInputElements
+             .map((formControl: ElementRef) => Observable.fromEvent(formControl.nativeElement, 'blur'));
 
         // Merge the blur event observable with the valueChanges observable
-        // Observable.merge(this.authorForm.valueChanges, ...controlBlurs).debounceTime(800).subscribe(value => {
-        //     this.displayMessage = this.genericValidator.processMessages(this.authorForm);
-        // });
+         Observable.merge(this.authorForm.valueChanges, ...controlBlurs).debounceTime(800).subscribe(value => {
+             this.displayMessage = this.genericValidator.processMessages(this.authorForm);
+         });
     }
 
     addBook(): void {
@@ -110,38 +109,39 @@ export class AuthorEditComponent implements OnInit, AfterViewInit, OnDestroy {
         });
     }
     getAuthor(id: number): void {
+        if (this.authorForm) {
+            this.authorForm.reset();
+        }
         this.authorService.getAuthor(id)
             .subscribe(
-            (author: AuthorToCreateDto) => this.onAuthorRetrieved(author),
+            (author: Author) => this.onAuthorRetrieved(author),
             (error: any) => this.errorMessage = <any>error
             );
     }
 
-    onAuthorRetrieved(author: AuthorToCreateDto): void {
+    onAuthorRetrieved(author: Author): void {
         if (this.authorForm) {
             this.authorForm.reset();
         }
         this.author = author;
 
         if (this.author.id === 0) {
-            this.pageTitle = 'Add Author';
-        } else {
             this.pageTitle = `Edit Author: ${this.author.name}`;
+        } else {
+            this.pageTitle = 'Add Author';
         }
-
         // Update the data on the form
         this.authorForm.patchValue({
-            authorName: this.author.name,
-            genre: this.author.genre,
-            dateOfBirth: this.author.dateOfBirth
+            name: this.author.name,
+            dateOfBirth: this.author.dateOfBirth,
+            genre: this.author.genre
         });
 
         if (this.author.books && this.author.books.length > 0) {
-            //let bookFormGroupArray: FormArray;
+            // let bookFormGroupArray: FormArray;
             this.author.books.forEach(element => {
                 (<FormArray>this.authorForm.get('books')).push(this.createBook(element.title, element.description));
             });
-            //this.authorForm.setControl('books', bookFormGroupArray);
         }
     }
 
